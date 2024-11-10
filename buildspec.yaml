@@ -1,5 +1,10 @@
 version: 0.2
 
+environment:
+  variables:
+    REPOSITORY_URI: "246246898030.dkr.ecr.us-east-1.amazonaws.com/sprint-boot-app"
+    AWS_DEFAULT_REGION: "us-east-1"
+
 phases:
   pre_build:
     commands:
@@ -26,7 +31,7 @@ phases:
       - printf '[{"name":"api-service","imageUri":"%s"}]' $REPOSITORY_URI:$IMAGE_TAG > imagedefinitions.json
       - echo Writing image definitions file...
       # add your container name
-      - DOCKER_CONTAINER_NAME=trinadh-registry
+      - DOCKER_CONTAINER_NAME=sprint-boot-app
       - printf '[{"name":"%s","imageUri":"%s"}]' $DOCKER_CONTAINER_NAME $REPOSITORY_URI:$IMAGE_TAG > imagedefinitions.json
       - echo $DOCKER_CONTAINER_NAME
       - echo printing imagedefinitions.json
