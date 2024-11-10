@@ -1,28 +1,19 @@
 version: 0.2
 
-env:
-  variables:
-    REPOSITORY_URI: "246246898030.dkr.ecr.us-east-1.amazonaws.com/sprint-boot-app"
-    AWS_DEFAULT_REGION: "us-east-1"
-
 phases:
+  install:
+    runtime-versions:
+      java: corretto17
   pre_build:
     commands:
-      - echo Starting pre-build phase...
       - echo Logging in to Amazon ECR...
-      - aws --version
-      - aws ecr get-login-password --region $AWS_DEFAULT_REGION | docker login --username AWS --password-stdin $REPOSITORY_URI
-      - COMMIT_HASH=$(echo $CODEBUILD_RESOLVED_SOURCE_VERSION | cut -c 1-7)
-      - IMAGE_TAG=build-$(echo $CODEBUILD_BUILD_ID | awk -F":" '{print $2}')
-      - echo Image tag set to $IMAGE_TAG
-
+      - aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin $REPOSITORY_URI
   build:
     commands:
-      - echo Starting build phase on `date`
+      - echo Build started on `date`
       - echo Building the Docker image...
       - docker build -t $REPOSITORY_URI:latest .
       - docker tag $REPOSITORY_URI:latest $REPOSITORY_URI:$IMAGE_TAG
-
   post_build:
     commands:
       - echo Build completed on `date`
@@ -37,4 +28,3 @@ phases:
 artifacts:
   files:
     - imagedefinitions.json
-    - target/api-service-0.0.1-SNAPSHOT.jar
