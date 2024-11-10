@@ -26,4 +26,3 @@ phases:
 artifacts:
   files:
     - imagedefinitions.json
-name: sprint-boot-app
