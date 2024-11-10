@@ -1,6 +1,5 @@
 version: 0.2
 
-# Environment variables for repository URI and region
 env:
   variables:
     REPOSITORY_URI: "246246898030.dkr.ecr.us-east-1.amazonaws.com/sprint-boot-app"
@@ -12,9 +11,7 @@ phases:
       - echo Starting pre-build phase...
       - echo Logging in to Amazon ECR...
       - aws --version
-      # Login to ECR
       - aws ecr get-login-password --region $AWS_DEFAULT_REGION | docker login --username AWS --password-stdin $REPOSITORY_URI
-      # Set image tags
       - COMMIT_HASH=$(echo $CODEBUILD_RESOLVED_SOURCE_VERSION | cut -c 1-7)
       - IMAGE_TAG=build-$(echo $CODEBUILD_BUILD_ID | awk -F":" '{print $2}')
       - echo Image tag set to $IMAGE_TAG
@@ -22,7 +19,6 @@ phases:
   build:
     commands:
       - echo Starting build phase on `date`
-      # Build and tag the Docker image
       - echo Building the Docker image...
       - docker build -t $REPOSITORY_URI:latest .
       - docker tag $REPOSITORY_URI:latest $REPOSITORY_URI:$IMAGE_TAG
@@ -30,11 +26,9 @@ phases:
   post_build:
     commands:
       - echo Build completed on `date`
-      # Push images to ECR
       - echo Pushing the Docker images to ECR...
       - docker push $REPOSITORY_URI:latest
       - docker push $REPOSITORY_URI:$IMAGE_TAG
-      # Create imagedefinitions.json for CodePipeline ECS deployment
       - echo Writing image definitions file...
       - printf '[{"name":"sprint-boot-app","imageUri":"%s"}]' "$REPOSITORY_URI:$IMAGE_TAG" > imagedefinitions.json
       - echo Printing imagedefinitions.json content:
